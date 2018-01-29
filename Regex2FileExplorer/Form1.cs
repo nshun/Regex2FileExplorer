@@ -30,7 +30,7 @@ namespace Regex2FileExplorer
         {
             if(e.KeyCode == Keys.Enter)
             {
-                //TODO ハイライト機能
+                //TODO ハイライト機能など
             }
         }
 

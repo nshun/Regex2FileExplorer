@@ -23,15 +23,11 @@ namespace Regex2FileExplorer
             textBox2.KeyDown += TextBox2_KeyDown;
             listBox1.MouseDoubleClick += ListBox1_MouseDoubleClick;
             listBox2.MouseDoubleClick += ListBox2_MouseDoubleClick;
-
         }
-        
+
         private void TextBoxRegexFrom_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter)
-            {
-                //TODO ハイライト機能など
-            }
+            //TODO ハイライト機能など
         }
 
         private void ListBox1_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -43,15 +39,16 @@ namespace Regex2FileExplorer
             else path = Path.Combine(dirPath, fileName);
             if (Directory.Exists(path))
             {
-                textBox1.Text = path;
+                textBox2.Text = textBox1.Text = path;
                 updateList(textBox1.Text, listBox1);
+                updateList(textBox2.Text, listBox2);
             }
-            else if(File.Exists(path))
+            else if (File.Exists(path))
             {
                 System.Diagnostics.Process.Start(path);
             }
-            
         }
+
         private void ListBox2_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             string path = "";
@@ -70,17 +67,13 @@ namespace Regex2FileExplorer
             }
         }
 
-
         private void TextBox1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter && Directory.Exists(textBox1.Text))
             {
                 updateList(textBox1.Text, listBox1);
-                if (string.IsNullOrEmpty(textBox2.Text))
-                {
-                    textBox2.Text = textBox1.Text;
-                    updateList(textBox1.Text, listBox2);
-                }
+                textBox2.Text = textBox1.Text;
+                updateList(textBox1.Text, listBox2);
             }
         }
 
@@ -115,15 +108,19 @@ namespace Regex2FileExplorer
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(textBox1.Text) || string.IsNullOrEmpty(textBox2.Text))
+            {
+                return;
+            }
             var fromFiles = getFileNames(textBox1.Text);
             var fromPattern = textBoxRegexFrom.Text;
             var toPattern = textBoxRegexTo.Text;
             foreach (var file in fromFiles)
             {
-                if(Regex.IsMatch(file, fromPattern))
+                if (Regex.IsMatch(file, fromPattern))
                 {
                     var toFile = Regex.Replace(file, fromPattern, toPattern);
-                    var sourcePath = new Uri(new Uri(textBox1.Text+@"\"), file).LocalPath;
+                    var sourcePath = new Uri(new Uri(textBox1.Text + @"\"), file).LocalPath;
                     var destPath = new Uri(new Uri(textBox2.Text + @"\"), toFile).LocalPath;
                     var destDir = Path.GetDirectoryName(destPath);
                     if (!Directory.Exists(destDir))
@@ -133,29 +130,64 @@ namespace Regex2FileExplorer
             }
             updateList(textBox1.Text, listBox1);
             updateList(textBox2.Text, listBox2);
+        }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var fromFiles = getFileNames(textBox1.Text);
+            var fromPattern = textBoxRegexFrom.Text;
+            var toPattern = textBoxRegexTo.Text;
+            foreach (var file in fromFiles)
+            {
+                if (Regex.IsMatch(file, fromPattern))
+                {
+                    var toFile = Regex.Replace(file, fromPattern, toPattern);
+                    var sourcePath = new Uri(new Uri(textBox1.Text + @"\"), file).LocalPath;
+                    var destPath = new Uri(new Uri(textBox2.Text + @"\"), toFile).LocalPath;
+                    var destDir = Path.GetDirectoryName(destPath);
+                    if (!Directory.Exists(destDir))
+                        Directory.CreateDirectory(destDir);
+                    File.Copy(sourcePath, destPath);
+                }
+            }
+            updateList(textBox1.Text, listBox1);
+            updateList(textBox2.Text, listBox2);
         }
 
         private string[] getFileDirNames(string path)
         {
-            string[] files = Directory.GetFileSystemEntries(path, "*", System.IO.SearchOption.TopDirectoryOnly);
-            string[] filesName = new string[files.Count()];
-            for (int i = 0; i < files.Count(); i++)
+            string[] filesName = new string[0];
+            try
             {
-                var name = Path.GetFileName(files[i]);
-                filesName[i] = name;
+                string[] files = Directory.GetFileSystemEntries(path, "*", System.IO.SearchOption.TopDirectoryOnly);
+                filesName = new string[files.Count()];
+                for (int i = 0; i < files.Count(); i++)
+                {
+                    var name = Path.GetFileName(files[i]);
+                    filesName[i] = name;
+                }
+            }
+            catch
+            {
             }
             return filesName;
         }
 
         private string[] getFileNames(string path)
         {
-            string[] files = Directory.GetFiles(path, "*", System.IO.SearchOption.TopDirectoryOnly);
-            string[] filesName = new string[files.Count()];
-            for (int i = 0; i < files.Count(); i++)
+            string[] filesName = new string[0];
+            try
             {
-                var name = Path.GetFileName(files[i]);
-                filesName[i] = name;
+                var files = Directory.GetFiles(path, "*", System.IO.SearchOption.AllDirectories);
+                filesName = new string[files.Count()];
+                for (int i = 0; i < files.Count(); i++)
+                {
+                    var name = files[i].Replace(path + "\\", "");
+                    filesName[i] = name;
+                }
+            }
+            catch
+            {
             }
             return filesName;
         }

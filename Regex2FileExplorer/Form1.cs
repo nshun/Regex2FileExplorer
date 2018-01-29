@@ -125,7 +125,7 @@ namespace Regex2FileExplorer
                     var destDir = Path.GetDirectoryName(destPath);
                     if (!Directory.Exists(destDir))
                         Directory.CreateDirectory(destDir);
-                    File.Move(sourcePath, destPath);
+                    if (!File.Exists(destPath)) File.Move(sourcePath, destPath);
                 }
             }
             updateList(textBox1.Text, listBox1);
@@ -147,7 +147,7 @@ namespace Regex2FileExplorer
                     var destDir = Path.GetDirectoryName(destPath);
                     if (!Directory.Exists(destDir))
                         Directory.CreateDirectory(destDir);
-                    File.Copy(sourcePath, destPath);
+                    if(!File.Exists(destPath)) File.Copy(sourcePath, destPath);
                 }
             }
             updateList(textBox1.Text, listBox1);

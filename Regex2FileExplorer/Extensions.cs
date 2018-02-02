@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace FolderTools
 {
-    class Program
+    class Extentions
     {
         static Dictionary<string, string> namesTable = new Dictionary<string, string>();
 
-        static void Main(string[] args)
+        static void Main2(string[] args)
         {
             var filePath = @"C:\Users\shun_nishimura\Desktop\生物参考書_ファイル名指示 - 図版ファイル名.csv";
             var sourceDir = @"C:\Users\shun_nishimura\Documents\GitHub\n-content-manuscripts-2018-spring\subjects\BI";
